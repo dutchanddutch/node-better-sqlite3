@@ -27,6 +27,19 @@ inline v8::Local<v8::String> InternalizedFromLatin1(v8::Isolate* isolate, const 
 	return v8::String::NewFromOneByte(isolate, reinterpret_cast<const uint8_t*>(str), v8::NewStringType::kInternalized).ToLocalChecked();
 }
 
+inline char *StringToUtf8Malloc(v8::Isolate* isolate, v8::Local<v8::String> string, int *size_p) {
+	int length = string->Utf8Length(isolate);
+	char *buf = (char *)malloc(length+1);
+	if (buf == NULL)
+		return buf;
+	length = string->WriteUtf8(isolate, buf, length, nullptr,
+			v8::String::REPLACE_INVALID_UTF8 | v8::String::NO_NULL_TERMINATION);
+	buf[length] = 0;
+	if (size_p)
+		*size_p = length;
+	return buf;
+}
+
 #hdr
 template <class T> using CopyablePersistent = v8::Persistent<T, v8::CopyablePersistentTraits<T>>;
 #end

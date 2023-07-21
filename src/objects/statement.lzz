@@ -8,6 +8,7 @@ public:
 		SetPrototypeMethod(isolate, data, t, "all", JS_all);
 		SetPrototypeMethod(isolate, data, t, "iterate", JS_iterate);
 		SetPrototypeMethod(isolate, data, t, "bind", JS_bind);
+		SetPrototypeMethod(isolate, data, t, "flat", JS_flat);
 		SetPrototypeMethod(isolate, data, t, "pluck", JS_pluck);
 		SetPrototypeMethod(isolate, data, t, "expand", JS_expand);
 		SetPrototypeMethod(isolate, data, t, "raw", JS_raw);
@@ -29,7 +30,7 @@ public:
 		int param_count = sqlite3_bind_parameter_count(handle);
 		for (int i = 1; i <= param_count; ++i) {
 			const char* name = sqlite3_bind_parameter_name(handle, i);
-			if (name != NULL) bind_map->Add(isolate, name + 1, i);
+			if (name != NULL && name[0] != '?') bind_map->Add(isolate, name + 1, i);
 		}
 		has_bind_map = true;
 		return bind_map;
@@ -230,6 +231,15 @@ private:
 		REQUIRE_STATEMENT_NOT_LOCKED(stmt);
 		STATEMENT_BIND(stmt->handle);
 		stmt->bound = true;
+		info.GetReturnValue().Set(info.This());
+	}
+
+	NODE_METHOD(JS_flat) {
+		Statement* stmt = Unwrap<Statement>(info.This());
+		if (!stmt->returns_data) return ThrowTypeError("The flat() method is only for statements that return data");
+		REQUIRE_DATABASE_NOT_BUSY(stmt->db->GetState());
+		REQUIRE_STATEMENT_NOT_LOCKED(stmt);
+		stmt->mode = Data::FLAT;
 		info.GetReturnValue().Set(info.This());
 	}
 
