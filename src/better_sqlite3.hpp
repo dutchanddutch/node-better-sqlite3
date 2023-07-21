@@ -170,139 +170,141 @@ class Database : public node::ObjectWrap
 public:
 #line 4 "./src/objects/database.lzz"
   static v8::Local <v8 :: Function> Init (v8::Isolate * isolate, v8::Local <v8 :: External> data);
-#line 23 "./src/objects/database.lzz"
+#line 24 "./src/objects/database.lzz"
   class CompareDatabase
   {
-#line 23 "./src/objects/database.lzz"
-  public:
 #line 24 "./src/objects/database.lzz"
+  public:
+#line 25 "./src/objects/database.lzz"
     bool operator () (Database const * const a, Database const * const b) const;
   };
-#line 28 "./src/objects/database.lzz"
+#line 29 "./src/objects/database.lzz"
   class CompareStatement
   {
-#line 28 "./src/objects/database.lzz"
-  public:
 #line 29 "./src/objects/database.lzz"
+  public:
+#line 30 "./src/objects/database.lzz"
     bool operator () (Statement const * const a, Statement const * const b) const;
   };
-#line 33 "./src/objects/database.lzz"
+#line 34 "./src/objects/database.lzz"
   class CompareBackup
   {
-#line 33 "./src/objects/database.lzz"
-  public:
 #line 34 "./src/objects/database.lzz"
+  public:
+#line 35 "./src/objects/database.lzz"
     bool operator () (Backup const * const a, Backup const * const b) const;
   };
-#line 40 "./src/objects/database.lzz"
+#line 41 "./src/objects/database.lzz"
   void ThrowDatabaseError ();
-#line 44 "./src/objects/database.lzz"
+#line 45 "./src/objects/database.lzz"
   static void ThrowSqliteError (Addon * addon, sqlite3 * db_handle);
-#line 48 "./src/objects/database.lzz"
+#line 49 "./src/objects/database.lzz"
   static void ThrowSqliteError (Addon * addon, char const * message, int code);
-#line 64 "./src/objects/database.lzz"
+#line 65 "./src/objects/database.lzz"
   bool Log (v8::Isolate * isolate, sqlite3_stmt * handle);
-#line 77 "./src/objects/database.lzz"
-  void AddStatement (Statement * stmt);
 #line 78 "./src/objects/database.lzz"
+  void AddStatement (Statement * stmt);
+#line 79 "./src/objects/database.lzz"
   void RemoveStatement (Statement * stmt);
-#line 81 "./src/objects/database.lzz"
-  void AddBackup (Backup * backup);
 #line 82 "./src/objects/database.lzz"
+  void AddBackup (Backup * backup);
+#line 83 "./src/objects/database.lzz"
   void RemoveBackup (Backup * backup);
-#line 86 "./src/objects/database.lzz"
+#line 87 "./src/objects/database.lzz"
   struct State
   {
-#line 87 "./src/objects/database.lzz"
-    bool const open;
 #line 88 "./src/objects/database.lzz"
-    bool busy;
+    bool const open;
 #line 89 "./src/objects/database.lzz"
-    bool const safe_ints;
+    bool busy;
 #line 90 "./src/objects/database.lzz"
-    bool const unsafe_mode;
+    bool const safe_ints;
 #line 91 "./src/objects/database.lzz"
-    bool was_js_error;
+    bool const unsafe_mode;
 #line 92 "./src/objects/database.lzz"
-    bool const has_logger;
+    bool was_js_error;
 #line 93 "./src/objects/database.lzz"
-    unsigned short int iterators;
+    bool const has_logger;
 #line 94 "./src/objects/database.lzz"
+    unsigned short int iterators;
+#line 95 "./src/objects/database.lzz"
     Addon * const addon;
   };
-#line 96 "./src/objects/database.lzz"
+#line 97 "./src/objects/database.lzz"
   State * GetState ();
-#line 99 "./src/objects/database.lzz"
+#line 100 "./src/objects/database.lzz"
   sqlite3 * GetHandle ();
-#line 102 "./src/objects/database.lzz"
+#line 103 "./src/objects/database.lzz"
   Addon * GetAddon ();
-#line 107 "./src/objects/database.lzz"
+#line 108 "./src/objects/database.lzz"
   void CloseHandles ();
-#line 119 "./src/objects/database.lzz"
+#line 120 "./src/objects/database.lzz"
   ~ Database ();
-#line 124 "./src/objects/database.lzz"
+#line 125 "./src/objects/database.lzz"
 private:
-#line 126 "./src/objects/database.lzz"
+#line 127 "./src/objects/database.lzz"
   explicit Database (v8::Isolate * isolate, Addon * addon, sqlite3 * db_handle, v8::Local <v8::Value> logger);
-#line 149 "./src/objects/database.lzz"
+#line 150 "./src/objects/database.lzz"
   static void JS_new (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 201 "./src/objects/database.lzz"
+#line 202 "./src/objects/database.lzz"
   static void JS_prepare (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 217 "./src/objects/database.lzz"
+#line 218 "./src/objects/database.lzz"
   static void JS_exec (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 257 "./src/objects/database.lzz"
+#line 258 "./src/objects/database.lzz"
   static void JS_backup (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 275 "./src/objects/database.lzz"
+#line 276 "./src/objects/database.lzz"
   static void JS_serialize (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 297 "./src/objects/database.lzz"
+#line 298 "./src/objects/database.lzz"
   static void JS_function (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 321 "./src/objects/database.lzz"
+#line 322 "./src/objects/database.lzz"
   static void JS_aggregate (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 350 "./src/objects/database.lzz"
+#line 351 "./src/objects/database.lzz"
   static void JS_table (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 370 "./src/objects/database.lzz"
+#line 371 "./src/objects/database.lzz"
   static void JS_loadExtension (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 392 "./src/objects/database.lzz"
+#line 393 "./src/objects/database.lzz"
   static void JS_close (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 402 "./src/objects/database.lzz"
+#line 403 "./src/objects/database.lzz"
   static void JS_defaultSafeIntegers (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 408 "./src/objects/database.lzz"
+#line 409 "./src/objects/database.lzz"
   static void JS_unsafeMode (v8::FunctionCallbackInfo <v8 :: Value> const & info);
-#line 415 "./src/objects/database.lzz"
+#line 416 "./src/objects/database.lzz"
+  static void JS_getTransactionState (v8::FunctionCallbackInfo <v8 :: Value> const & info);
+#line 433 "./src/objects/database.lzz"
   static void JS_open (v8::Local <v8 :: String> _, v8::PropertyCallbackInfo <v8 :: Value> const & info);
-#line 419 "./src/objects/database.lzz"
+#line 437 "./src/objects/database.lzz"
   static void JS_inTransaction (v8::Local <v8 :: String> _, v8::PropertyCallbackInfo <v8 :: Value> const & info);
-#line 424 "./src/objects/database.lzz"
+#line 442 "./src/objects/database.lzz"
   static bool Deserialize (v8::Local <v8::Object> buffer, Addon * addon, sqlite3 * db_handle, bool readonly);
-#line 449 "./src/objects/database.lzz"
-  static void FreeSerialization (char * data, void * _);
-#line 453 "./src/objects/database.lzz"
-  static int const MAX_BUFFER_SIZE = node::Buffer::kMaxLength > INT_MAX ? INT_MAX : static_cast<int>(node::Buffer::kMaxLength);
-#line 454 "./src/objects/database.lzz"
-  static int const MAX_STRING_SIZE = v8::String::kMaxLength > INT_MAX ? INT_MAX : static_cast<int>(v8::String::kMaxLength);
-#line 456 "./src/objects/database.lzz"
-  sqlite3 * const db_handle;
-#line 457 "./src/objects/database.lzz"
-  bool open;
-#line 458 "./src/objects/database.lzz"
-  bool busy;
-#line 459 "./src/objects/database.lzz"
-  bool safe_ints;
-#line 460 "./src/objects/database.lzz"
-  bool unsafe_mode;
-#line 461 "./src/objects/database.lzz"
-  bool was_js_error;
-#line 462 "./src/objects/database.lzz"
-  bool const has_logger;
-#line 463 "./src/objects/database.lzz"
-  unsigned short int iterators;
-#line 464 "./src/objects/database.lzz"
-  Addon * const addon;
-#line 465 "./src/objects/database.lzz"
-  CopyablePersistent <v8::Value> const logger;
-#line 466 "./src/objects/database.lzz"
-  std::set <Statement*, CompareStatement> stmts;
 #line 467 "./src/objects/database.lzz"
+  static void FreeSerialization (char * data, void * _);
+#line 471 "./src/objects/database.lzz"
+  static int const MAX_BUFFER_SIZE = node::Buffer::kMaxLength > INT_MAX ? INT_MAX : static_cast<int>(node::Buffer::kMaxLength);
+#line 472 "./src/objects/database.lzz"
+  static int const MAX_STRING_SIZE = v8::String::kMaxLength > INT_MAX ? INT_MAX : static_cast<int>(v8::String::kMaxLength);
+#line 474 "./src/objects/database.lzz"
+  sqlite3 * const db_handle;
+#line 475 "./src/objects/database.lzz"
+  bool open;
+#line 476 "./src/objects/database.lzz"
+  bool busy;
+#line 477 "./src/objects/database.lzz"
+  bool safe_ints;
+#line 478 "./src/objects/database.lzz"
+  bool unsafe_mode;
+#line 479 "./src/objects/database.lzz"
+  bool was_js_error;
+#line 480 "./src/objects/database.lzz"
+  bool const has_logger;
+#line 481 "./src/objects/database.lzz"
+  unsigned short int iterators;
+#line 482 "./src/objects/database.lzz"
+  Addon * const addon;
+#line 483 "./src/objects/database.lzz"
+  CopyablePersistent <v8::Value> const logger;
+#line 484 "./src/objects/database.lzz"
+  std::set <Statement*, CompareStatement> stmts;
+#line 485 "./src/objects/database.lzz"
   std::set <Backup*, CompareBackup> backups;
 };
 #line 1 "./src/objects/statement.lzz"
@@ -880,41 +882,41 @@ LZZ_INLINE int BindMap::GetSize ()
                              {
                 return length;
 }
-#line 77 "./src/objects/database.lzz"
+#line 78 "./src/objects/database.lzz"
 LZZ_INLINE void Database::AddStatement (Statement * stmt)
-#line 77 "./src/objects/database.lzz"
+#line 78 "./src/objects/database.lzz"
                                                   { stmts.insert(stmts.end(), stmt);
 }
-#line 78 "./src/objects/database.lzz"
+#line 79 "./src/objects/database.lzz"
 LZZ_INLINE void Database::RemoveStatement (Statement * stmt)
-#line 78 "./src/objects/database.lzz"
+#line 79 "./src/objects/database.lzz"
                                                      { stmts.erase(stmt);
 }
-#line 81 "./src/objects/database.lzz"
+#line 82 "./src/objects/database.lzz"
 LZZ_INLINE void Database::AddBackup (Backup * backup)
-#line 81 "./src/objects/database.lzz"
+#line 82 "./src/objects/database.lzz"
                                               { backups.insert(backups.end(), backup);
 }
-#line 82 "./src/objects/database.lzz"
+#line 83 "./src/objects/database.lzz"
 LZZ_INLINE void Database::RemoveBackup (Backup * backup)
-#line 82 "./src/objects/database.lzz"
+#line 83 "./src/objects/database.lzz"
                                                  { backups.erase(backup);
 }
-#line 96 "./src/objects/database.lzz"
+#line 97 "./src/objects/database.lzz"
 LZZ_INLINE Database::State * Database::GetState ()
-#line 96 "./src/objects/database.lzz"
+#line 97 "./src/objects/database.lzz"
                                  {
                 return reinterpret_cast<State*>(&open);
 }
-#line 99 "./src/objects/database.lzz"
+#line 100 "./src/objects/database.lzz"
 LZZ_INLINE sqlite3 * Database::GetHandle ()
-#line 99 "./src/objects/database.lzz"
+#line 100 "./src/objects/database.lzz"
                                     {
                 return db_handle;
 }
-#line 102 "./src/objects/database.lzz"
+#line 103 "./src/objects/database.lzz"
 LZZ_INLINE Addon * Database::GetAddon ()
-#line 102 "./src/objects/database.lzz"
+#line 103 "./src/objects/database.lzz"
                                  {
                 return addon;
 }
