@@ -9,6 +9,13 @@
     "url": "git://github.com/WiseLibs/better-sqlite3.git"
   },
   "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./*.json": "./*.json",
+    "./*.js": "./*.js",
+    "./package": "./package.json",
+    "./lib/*": "./lib/*.js"
+  },
   "files": [
     "binding.gyp",
     "src/*.[ch]pp",
