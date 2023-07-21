@@ -11,12 +11,14 @@
 			return sqlite3_##to##_int64(__VA_ARGS__, v);                       \
 		}                                                                      \
 	} else if (value->IsString()) {                                            \
-		v8::String::Utf8Value utf8(isolate, value.As<v8::String>());           \
+		int length = 0;                                                        \
+		char *buf = StringToUtf8Malloc(isolate, value.As<v8::String>(),        \
+						&length);                                              \
 		return sqlite3_##to##_text(                                            \
 			__VA_ARGS__,                                                       \
-			*utf8,                                                             \
-			utf8.length(),                                                     \
-			SQLITE_TRANSIENT                                                   \
+			buf,                                                               \
+			length,                                                            \
+			free                                                               \
 		);                                                                     \
 	} else if (node::Buffer::HasInstance(value)) {                             \
 		const char* data = node::Buffer::Data(value);                          \

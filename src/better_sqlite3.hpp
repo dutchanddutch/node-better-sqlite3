@@ -16,7 +16,7 @@
 #include <node.h>
 #include <node_object_wrap.h>
 #include <node_buffer.h>
-#line 31 "./src/util/macros.lzz"
+#line 44 "./src/util/macros.lzz"
 template <class T> using CopyablePersistent = v8::Persistent<T, v8::CopyablePersistentTraits<T>>;
 #line 36 "./src/util/binder.lzz"
 	static bool IsPlainObject(v8::Isolate* isolate, v8::Local<v8::Object> obj);
@@ -29,31 +29,33 @@ v8::Local <v8::String> InternalizedFromUtf8 (v8::Isolate * isolate, char const *
 v8::Local <v8::Value> InternalizedFromUtf8OrNull (v8::Isolate * isolate, char const * data, int length);
 #line 26 "./src/util/macros.lzz"
 v8::Local <v8::String> InternalizedFromLatin1 (v8::Isolate * isolate, char const * str);
-#line 33 "./src/util/macros.lzz"
+#line 30 "./src/util/macros.lzz"
+char * StringToUtf8Malloc (v8::Isolate * isolate, v8::Local <v8::String> string, int * size_p);
+#line 46 "./src/util/macros.lzz"
 void SetFrozen (v8::Isolate * isolate, v8::Local <v8::Context> ctx, v8::Local <v8::Object> obj, CopyablePersistent <v8::String> & key, v8::Local <v8::Value> value);
-#line 37 "./src/util/macros.lzz"
+#line 50 "./src/util/macros.lzz"
 void ThrowError (char const * message);
-#line 38 "./src/util/macros.lzz"
+#line 51 "./src/util/macros.lzz"
 void ThrowTypeError (char const * message);
-#line 39 "./src/util/macros.lzz"
+#line 52 "./src/util/macros.lzz"
 void ThrowRangeError (char const * message);
-#line 91 "./src/util/macros.lzz"
+#line 104 "./src/util/macros.lzz"
 bool IS_SKIPPED (char c);
-#line 96 "./src/util/macros.lzz"
+#line 109 "./src/util/macros.lzz"
 template <typename T>
-#line 96 "./src/util/macros.lzz"
+#line 109 "./src/util/macros.lzz"
 T * ALLOC_ARRAY (size_t count);
-#line 101 "./src/util/macros.lzz"
+#line 114 "./src/util/macros.lzz"
 template <typename T>
-#line 101 "./src/util/macros.lzz"
+#line 114 "./src/util/macros.lzz"
 void FREE_ARRAY (T * array_pointer);
-#line 105 "./src/util/macros.lzz"
+#line 118 "./src/util/macros.lzz"
 v8::Local <v8::FunctionTemplate> NewConstructorTemplate (v8::Isolate * isolate, v8::Local <v8::External> data, v8::FunctionCallback func, char const * name);
-#line 116 "./src/util/macros.lzz"
-void SetPrototypeMethod (v8::Isolate * isolate, v8::Local <v8::External> data, v8::Local <v8::FunctionTemplate> recv, char const * name, v8::FunctionCallback func);
 #line 129 "./src/util/macros.lzz"
-void SetPrototypeSymbolMethod (v8::Isolate * isolate, v8::Local <v8::External> data, v8::Local <v8::FunctionTemplate> recv, v8::Local <v8::Symbol> symbol, v8::FunctionCallback func);
+void SetPrototypeMethod (v8::Isolate * isolate, v8::Local <v8::External> data, v8::Local <v8::FunctionTemplate> recv, char const * name, v8::FunctionCallback func);
 #line 142 "./src/util/macros.lzz"
+void SetPrototypeSymbolMethod (v8::Isolate * isolate, v8::Local <v8::External> data, v8::Local <v8::FunctionTemplate> recv, v8::Local <v8::Symbol> symbol, v8::FunctionCallback func);
+#line 155 "./src/util/macros.lzz"
 void SetPrototypeGetter (v8::Isolate * isolate, v8::Local <v8::External> data, v8::Local <v8::FunctionTemplate> recv, char const * name, v8::AccessorGetterCallback func);
 #line 1 "./src/util/constants.lzz"
 class CS
@@ -681,58 +683,58 @@ private:
 #line 403 "./src/util/custom-table.lzz"
   CopyablePersistent <v8::Function> const factory;
 };
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 72 "./src/util/data.lzz"
+#line 74 "./src/util/data.lzz"
   v8::Local <v8::Value> GetValueJS (v8::Isolate * isolate, sqlite3_stmt * handle, int column, bool safe_ints);
 }
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 76 "./src/util/data.lzz"
+#line 78 "./src/util/data.lzz"
   v8::Local <v8::Value> GetValueJS (v8::Isolate * isolate, sqlite3_value * value, bool safe_ints);
 }
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 80 "./src/util/data.lzz"
+#line 82 "./src/util/data.lzz"
   v8::Local <v8::Value> GetFlatRowJS (v8::Isolate * isolate, v8::Local <v8::Context> ctx, sqlite3_stmt * handle, bool safe_ints);
 }
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 91 "./src/util/data.lzz"
+#line 93 "./src/util/data.lzz"
   v8::Local <v8::Value> GetExpandedRowJS (v8::Isolate * isolate, v8::Local <v8::Context> ctx, sqlite3_stmt * handle, bool safe_ints);
 }
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 110 "./src/util/data.lzz"
+#line 112 "./src/util/data.lzz"
   v8::Local <v8::Value> GetRawRowJS (v8::Isolate * isolate, v8::Local <v8::Context> ctx, sqlite3_stmt * handle, bool safe_ints);
 }
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 119 "./src/util/data.lzz"
+#line 121 "./src/util/data.lzz"
   v8::Local <v8::Value> GetRowJS (v8::Isolate * isolate, v8::Local <v8::Context> ctx, sqlite3_stmt * handle, bool safe_ints, char mode);
 }
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 128 "./src/util/data.lzz"
+#line 130 "./src/util/data.lzz"
   void GetArgumentsJS (v8::Isolate * isolate, v8::Local <v8::Value> * out, sqlite3_value * * values, int argument_count, bool safe_ints);
 }
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 135 "./src/util/data.lzz"
+#line 137 "./src/util/data.lzz"
   int BindValueFromJS (v8::Isolate * isolate, sqlite3_stmt * handle, int index, v8::Local <v8::Value> value);
 }
-#line 65 "./src/util/data.lzz"
+#line 67 "./src/util/data.lzz"
 namespace Data
 {
-#line 140 "./src/util/data.lzz"
+#line 142 "./src/util/data.lzz"
   void ResultValueFromJS (v8::Isolate * isolate, sqlite3_context * invocation, v8::Local <v8::Value> value, DataConverter * converter);
 }
 #line 1 "./src/util/binder.lzz"
@@ -828,31 +830,46 @@ LZZ_INLINE v8::Local <v8::String> InternalizedFromLatin1 (v8::Isolate * isolate,
                                                                                            {
         return v8::String::NewFromOneByte(isolate, reinterpret_cast<const uint8_t*>(str), v8::NewStringType::kInternalized).ToLocalChecked();
 }
-#line 33 "./src/util/macros.lzz"
+#line 30 "./src/util/macros.lzz"
+LZZ_INLINE char * StringToUtf8Malloc (v8::Isolate * isolate, v8::Local <v8::String> string, int * size_p)
+#line 30 "./src/util/macros.lzz"
+                                                                                                 {
+        int length = string->Utf8Length(isolate);
+        char *buf = (char *)malloc(length+1);
+        if (buf == NULL)
+                return buf;
+        length = string->WriteUtf8(isolate, buf, length, nullptr,
+                        v8::String::REPLACE_INVALID_UTF8 | v8::String::NO_NULL_TERMINATION);
+        buf[length] = 0;
+        if (size_p)
+                *size_p = length;
+        return buf;
+}
+#line 46 "./src/util/macros.lzz"
 LZZ_INLINE void SetFrozen (v8::Isolate * isolate, v8::Local <v8::Context> ctx, v8::Local <v8::Object> obj, CopyablePersistent <v8::String> & key, v8::Local <v8::Value> value)
-#line 33 "./src/util/macros.lzz"
+#line 46 "./src/util/macros.lzz"
                                                                                                                                                                     {
         obj->DefineOwnProperty(ctx, key.Get(isolate), value, static_cast<v8::PropertyAttribute>(v8::DontDelete | v8::ReadOnly)).FromJust();
 }
-#line 91 "./src/util/macros.lzz"
+#line 104 "./src/util/macros.lzz"
 LZZ_INLINE bool IS_SKIPPED (char c)
-#line 91 "./src/util/macros.lzz"
+#line 104 "./src/util/macros.lzz"
                                {
         return c == ' ' || c == ';' || (c >= '\t' && c <= '\r');
 }
-#line 96 "./src/util/macros.lzz"
+#line 109 "./src/util/macros.lzz"
 template <typename T>
-#line 96 "./src/util/macros.lzz"
+#line 109 "./src/util/macros.lzz"
 LZZ_INLINE T * ALLOC_ARRAY (size_t count)
-#line 96 "./src/util/macros.lzz"
+#line 109 "./src/util/macros.lzz"
                                                       {
         return static_cast<T*>(::operator new[](count * sizeof(T)));
 }
-#line 101 "./src/util/macros.lzz"
+#line 114 "./src/util/macros.lzz"
 template <typename T>
-#line 101 "./src/util/macros.lzz"
+#line 114 "./src/util/macros.lzz"
 LZZ_INLINE void FREE_ARRAY (T * array_pointer)
-#line 101 "./src/util/macros.lzz"
+#line 114 "./src/util/macros.lzz"
                                                            {
         ::operator delete[](array_pointer);
 }
