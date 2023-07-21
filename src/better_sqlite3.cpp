@@ -768,6 +768,7 @@ v8::Local <v8 :: Function> Statement::Init (v8::Isolate * isolate, v8::Local <v8
                 SetPrototypeMethod(isolate, data, t, "all", JS_all);
                 SetPrototypeMethod(isolate, data, t, "iterate", JS_iterate);
                 SetPrototypeMethod(isolate, data, t, "bind", JS_bind);
+                SetPrototypeMethod(isolate, data, t, "flat", JS_flat);
                 SetPrototypeMethod(isolate, data, t, "pluck", JS_pluck);
                 SetPrototypeMethod(isolate, data, t, "expand", JS_expand);
                 SetPrototypeMethod(isolate, data, t, "raw", JS_raw);
@@ -776,9 +777,9 @@ v8::Local <v8 :: Function> Statement::Init (v8::Isolate * isolate, v8::Local <v8
                 SetPrototypeGetter(isolate, data, t, "busy", JS_busy);
                 return t->GetFunction( isolate -> GetCurrentContext ( ) ).ToLocalChecked();
 }
-#line 26 "./src/objects/statement.lzz"
+#line 27 "./src/objects/statement.lzz"
 BindMap * Statement::GetBindMap (v8::Isolate * isolate)
-#line 26 "./src/objects/statement.lzz"
+#line 27 "./src/objects/statement.lzz"
                                                   {
                 if (has_bind_map) return &extras->bind_map;
                 BindMap* bind_map = &extras->bind_map;
@@ -790,34 +791,34 @@ BindMap * Statement::GetBindMap (v8::Isolate * isolate)
                 has_bind_map = true;
                 return bind_map;
 }
-#line 39 "./src/objects/statement.lzz"
+#line 40 "./src/objects/statement.lzz"
 void Statement::CloseHandles ()
-#line 39 "./src/objects/statement.lzz"
+#line 40 "./src/objects/statement.lzz"
                             {
                 if (alive) {
                         alive = false;
                         sqlite3_finalize(handle);
                 }
 }
-#line 46 "./src/objects/statement.lzz"
+#line 47 "./src/objects/statement.lzz"
 Statement::~ Statement ()
-#line 46 "./src/objects/statement.lzz"
+#line 47 "./src/objects/statement.lzz"
                      {
                 if (alive) db->RemoveStatement(this);
                 CloseHandles();
                 delete extras;
 }
-#line 56 "./src/objects/statement.lzz"
+#line 57 "./src/objects/statement.lzz"
 Statement::Extras::Extras (sqlite3_uint64 id)
-#line 56 "./src/objects/statement.lzz"
+#line 57 "./src/objects/statement.lzz"
   : bind_map (0), id (id)
-#line 56 "./src/objects/statement.lzz"
+#line 57 "./src/objects/statement.lzz"
                                                                          {}
-#line 61 "./src/objects/statement.lzz"
+#line 62 "./src/objects/statement.lzz"
 Statement::Statement (Database * db, sqlite3_stmt * handle, sqlite3_uint64 id, bool returns_data)
-#line 66 "./src/objects/statement.lzz"
+#line 67 "./src/objects/statement.lzz"
   : node::ObjectWrap (), db (db), handle (handle), extras (new Extras(id)), alive (true), locked (false), bound (false), has_bind_map (false), safe_ints (db->GetState()->safe_ints), mode (Data::FLAT), returns_data (returns_data)
-#line 77 "./src/objects/statement.lzz"
+#line 78 "./src/objects/statement.lzz"
                                            {
                 assert(db != NULL);
                 assert(handle != NULL);
@@ -825,9 +826,9 @@ Statement::Statement (Database * db, sqlite3_stmt * handle, sqlite3_uint64 id, b
                 assert(!db->GetState()->busy);
                 db->AddStatement(this);
 }
-#line 85 "./src/objects/statement.lzz"
+#line 86 "./src/objects/statement.lzz"
 void Statement::JS_new (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 85 "./src/objects/statement.lzz"
+#line 86 "./src/objects/statement.lzz"
                             {
                 Addon * addon = static_cast < Addon * > ( info . Data ( ) . As < v8 :: External > ( ) -> Value ( ) ) ;
                 if (!addon->privileged_info) {
@@ -898,9 +899,9 @@ void Statement::JS_new (v8::FunctionCallbackInfo <v8 :: Value> const & info)
 
                 info.GetReturnValue().Set(info.This());
 }
-#line 156 "./src/objects/statement.lzz"
+#line 157 "./src/objects/statement.lzz"
 void Statement::JS_run (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 156 "./src/objects/statement.lzz"
+#line 157 "./src/objects/statement.lzz"
                             {
                 Statement * stmt = node :: ObjectWrap :: Unwrap < Statement > ( info . This ( ) ) ; ( ( void ) 0 ) ; sqlite3_stmt * handle = stmt -> handle ; Database * db = stmt -> db ; if ( ! db -> GetState ( ) -> open ) return ThrowTypeError ( "The database connection is not open" ) ; if ( db -> GetState ( ) -> busy ) return ThrowTypeError ( "This database connection is busy executing a query" ) ; if ( stmt -> locked ) return ThrowTypeError ( "This statement is busy executing a query" ) ; if ( ! db -> GetState ( ) -> unsafe_mode ) { if ( db -> GetState ( ) -> iterators ) return ThrowTypeError ( "This database connection is busy executing a query" ) ; } ( ( void ) 0 ) ; const bool bound = stmt -> bound ; if ( ! bound ) { Binder binder ( handle ) ; if ( ! binder . Bind ( info , info . Length ( ) , stmt ) ) { sqlite3_clear_bindings ( handle ) ; return ; } ( ( void ) 0 ) ; } else if ( info . Length ( ) > 0 ) { return ThrowTypeError ( "This statement already has bound parameters" ) ; } ( ( void ) 0 ) ; db -> GetState ( ) -> busy = true ; v8 :: Isolate * isolate = info . GetIsolate ( ) ; if ( db -> Log ( isolate , handle ) ) { db -> GetState ( ) -> busy = false ; db -> ThrowDatabaseError ( ) ; if ( ! bound ) { sqlite3_clear_bindings ( handle ) ; } return ; } ( ( void ) 0 ) ;
                 sqlite3* db_handle = db->GetHandle();
@@ -923,9 +924,9 @@ void Statement::JS_run (v8::FunctionCallbackInfo <v8 :: Value> const & info)
                 }
                 db -> GetState ( ) -> busy = false ; db -> ThrowDatabaseError ( ) ; if ( ! bound ) { sqlite3_clear_bindings ( handle ) ; } return ;
 }
-#line 179 "./src/objects/statement.lzz"
+#line 180 "./src/objects/statement.lzz"
 void Statement::JS_get (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 179 "./src/objects/statement.lzz"
+#line 180 "./src/objects/statement.lzz"
                             {
                 Statement * stmt = node :: ObjectWrap :: Unwrap < Statement > ( info . This ( ) ) ; if ( ! stmt -> returns_data ) return ThrowTypeError ( "This statement does not return data. Use run() instead" ) ; sqlite3_stmt * handle = stmt -> handle ; Database * db = stmt -> db ; if ( ! db -> GetState ( ) -> open ) return ThrowTypeError ( "The database connection is not open" ) ; if ( db -> GetState ( ) -> busy ) return ThrowTypeError ( "This database connection is busy executing a query" ) ; if ( stmt -> locked ) return ThrowTypeError ( "This statement is busy executing a query" ) ; const bool bound = stmt -> bound ; if ( ! bound ) { Binder binder ( handle ) ; if ( ! binder . Bind ( info , info . Length ( ) , stmt ) ) { sqlite3_clear_bindings ( handle ) ; return ; } ( ( void ) 0 ) ; } else if ( info . Length ( ) > 0 ) { return ThrowTypeError ( "This statement already has bound parameters" ) ; } ( ( void ) 0 ) ; db -> GetState ( ) -> busy = true ; v8 :: Isolate * isolate = info . GetIsolate ( ) ; if ( db -> Log ( isolate , handle ) ) { db -> GetState ( ) -> busy = false ; db -> ThrowDatabaseError ( ) ; if ( ! bound ) { sqlite3_clear_bindings ( handle ) ; } return ; } ( ( void ) 0 ) ;
                 int status = sqlite3_step(handle);
@@ -940,9 +941,9 @@ void Statement::JS_get (v8::FunctionCallbackInfo <v8 :: Value> const & info)
                 sqlite3_reset(handle);
                 db -> GetState ( ) -> busy = false ; db -> ThrowDatabaseError ( ) ; if ( ! bound ) { sqlite3_clear_bindings ( handle ) ; } return ;
 }
-#line 194 "./src/objects/statement.lzz"
+#line 195 "./src/objects/statement.lzz"
 void Statement::JS_all (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 194 "./src/objects/statement.lzz"
+#line 195 "./src/objects/statement.lzz"
                             {
                 Statement * stmt = node :: ObjectWrap :: Unwrap < Statement > ( info . This ( ) ) ; if ( ! stmt -> returns_data ) return ThrowTypeError ( "This statement does not return data. Use run() instead" ) ; sqlite3_stmt * handle = stmt -> handle ; Database * db = stmt -> db ; if ( ! db -> GetState ( ) -> open ) return ThrowTypeError ( "The database connection is not open" ) ; if ( db -> GetState ( ) -> busy ) return ThrowTypeError ( "This database connection is busy executing a query" ) ; if ( stmt -> locked ) return ThrowTypeError ( "This statement is busy executing a query" ) ; const bool bound = stmt -> bound ; if ( ! bound ) { Binder binder ( handle ) ; if ( ! binder . Bind ( info , info . Length ( ) , stmt ) ) { sqlite3_clear_bindings ( handle ) ; return ; } ( ( void ) 0 ) ; } else if ( info . Length ( ) > 0 ) { return ThrowTypeError ( "This statement already has bound parameters" ) ; } ( ( void ) 0 ) ; db -> GetState ( ) -> busy = true ; v8 :: Isolate * isolate = info . GetIsolate ( ) ; if ( db -> Log ( isolate , handle ) ) { db -> GetState ( ) -> busy = false ; db -> ThrowDatabaseError ( ) ; if ( ! bound ) { sqlite3_clear_bindings ( handle ) ; } return ; } ( ( void ) 0 ) ;
                 v8 :: Local < v8 :: Context > ctx = isolate -> GetCurrentContext ( ) ;
@@ -963,9 +964,9 @@ void Statement::JS_all (v8::FunctionCallbackInfo <v8 :: Value> const & info)
                 if (js_error) db->GetState()->was_js_error = true;
                 db -> GetState ( ) -> busy = false ; db -> ThrowDatabaseError ( ) ; if ( ! bound ) { sqlite3_clear_bindings ( handle ) ; } return ;
 }
-#line 215 "./src/objects/statement.lzz"
+#line 216 "./src/objects/statement.lzz"
 void Statement::JS_iterate (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 215 "./src/objects/statement.lzz"
+#line 216 "./src/objects/statement.lzz"
                                 {
                 Addon * addon = static_cast < Addon * > ( info . Data ( ) . As < v8 :: External > ( ) -> Value ( ) ) ;
                 v8 :: Isolate * isolate = info . GetIsolate ( ) ;
@@ -975,9 +976,9 @@ void Statement::JS_iterate (v8::FunctionCallbackInfo <v8 :: Value> const & info)
                 addon->privileged_info = NULL;
                 if (!maybeIterator.IsEmpty()) info.GetReturnValue().Set(maybeIterator.ToLocalChecked());
 }
-#line 225 "./src/objects/statement.lzz"
+#line 226 "./src/objects/statement.lzz"
 void Statement::JS_bind (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 225 "./src/objects/statement.lzz"
+#line 226 "./src/objects/statement.lzz"
                              {
                 Statement* stmt = node :: ObjectWrap :: Unwrap <Statement>(info.This());
                 if (stmt->bound) return ThrowTypeError("The bind() method can only be invoked once per statement object");
@@ -988,9 +989,20 @@ void Statement::JS_bind (v8::FunctionCallbackInfo <v8 :: Value> const & info)
                 stmt->bound = true;
                 info.GetReturnValue().Set(info.This());
 }
-#line 236 "./src/objects/statement.lzz"
+#line 237 "./src/objects/statement.lzz"
+void Statement::JS_flat (v8::FunctionCallbackInfo <v8 :: Value> const & info)
+#line 237 "./src/objects/statement.lzz"
+                             {
+                Statement* stmt = node :: ObjectWrap :: Unwrap <Statement>(info.This());
+                if (!stmt->returns_data) return ThrowTypeError("The flat() method is only for statements that return data");
+                if ( stmt -> db -> GetState ( ) -> busy ) return ThrowTypeError ( "This database connection is busy executing a query" ) ;
+                if ( stmt -> locked ) return ThrowTypeError ( "This statement is busy executing a query" ) ;
+                stmt->mode = Data::FLAT;
+                info.GetReturnValue().Set(info.This());
+}
+#line 246 "./src/objects/statement.lzz"
 void Statement::JS_pluck (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 236 "./src/objects/statement.lzz"
+#line 246 "./src/objects/statement.lzz"
                               {
                 Statement* stmt = node :: ObjectWrap :: Unwrap <Statement>(info.This());
                 if (!stmt->returns_data) return ThrowTypeError("The pluck() method is only for statements that return data");
@@ -1001,9 +1013,9 @@ void Statement::JS_pluck (v8::FunctionCallbackInfo <v8 :: Value> const & info)
                 stmt->mode = use ? Data::PLUCK : stmt->mode == Data::PLUCK ? Data::FLAT : stmt->mode;
                 info.GetReturnValue().Set(info.This());
 }
-#line 247 "./src/objects/statement.lzz"
+#line 257 "./src/objects/statement.lzz"
 void Statement::JS_expand (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 247 "./src/objects/statement.lzz"
+#line 257 "./src/objects/statement.lzz"
                                {
                 Statement* stmt = node :: ObjectWrap :: Unwrap <Statement>(info.This());
                 if (!stmt->returns_data) return ThrowTypeError("The expand() method is only for statements that return data");
@@ -1014,9 +1026,9 @@ void Statement::JS_expand (v8::FunctionCallbackInfo <v8 :: Value> const & info)
                 stmt->mode = use ? Data::EXPAND : stmt->mode == Data::EXPAND ? Data::FLAT : stmt->mode;
                 info.GetReturnValue().Set(info.This());
 }
-#line 258 "./src/objects/statement.lzz"
+#line 268 "./src/objects/statement.lzz"
 void Statement::JS_raw (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 258 "./src/objects/statement.lzz"
+#line 268 "./src/objects/statement.lzz"
                             {
                 Statement* stmt = node :: ObjectWrap :: Unwrap <Statement>(info.This());
                 if (!stmt->returns_data) return ThrowTypeError("The raw() method is only for statements that return data");
@@ -1027,9 +1039,9 @@ void Statement::JS_raw (v8::FunctionCallbackInfo <v8 :: Value> const & info)
                 stmt->mode = use ? Data::RAW : stmt->mode == Data::RAW ? Data::FLAT : stmt->mode;
                 info.GetReturnValue().Set(info.This());
 }
-#line 269 "./src/objects/statement.lzz"
+#line 279 "./src/objects/statement.lzz"
 void Statement::JS_safeIntegers (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 269 "./src/objects/statement.lzz"
+#line 279 "./src/objects/statement.lzz"
                                      {
                 Statement* stmt = node :: ObjectWrap :: Unwrap <Statement>(info.This());
                 if ( stmt -> db -> GetState ( ) -> busy ) return ThrowTypeError ( "This database connection is busy executing a query" ) ;
@@ -1038,9 +1050,9 @@ void Statement::JS_safeIntegers (v8::FunctionCallbackInfo <v8 :: Value> const & 
                 else { if ( info . Length ( ) <= ( 0 ) || ! info [ 0 ] -> IsBoolean ( ) ) return ThrowTypeError ( "Expected " "first" " argument to be " "a boolean" ) ; stmt -> safe_ints = ( info [ 0 ] . As < v8 :: Boolean > ( ) ) -> Value ( ) ; }
                 info.GetReturnValue().Set(info.This());
 }
-#line 278 "./src/objects/statement.lzz"
+#line 288 "./src/objects/statement.lzz"
 void Statement::JS_columns (v8::FunctionCallbackInfo <v8 :: Value> const & info)
-#line 278 "./src/objects/statement.lzz"
+#line 288 "./src/objects/statement.lzz"
                                 {
                 Statement* stmt = node :: ObjectWrap :: Unwrap <Statement>(info.This());
                 if (!stmt->returns_data) return ThrowTypeError("The columns() method is only for statements that return data");
@@ -1083,9 +1095,9 @@ void Statement::JS_columns (v8::FunctionCallbackInfo <v8 :: Value> const & info)
 
                 info.GetReturnValue().Set(columns);
 }
-#line 321 "./src/objects/statement.lzz"
+#line 331 "./src/objects/statement.lzz"
 void Statement::JS_busy (v8::Local <v8 :: String> _, v8::PropertyCallbackInfo <v8 :: Value> const & info)
-#line 321 "./src/objects/statement.lzz"
+#line 331 "./src/objects/statement.lzz"
                              {
                 Statement* stmt = node :: ObjectWrap :: Unwrap <Statement>(info.This());
                 info.GetReturnValue().Set(stmt->alive && stmt->locked);
