@@ -14,6 +14,7 @@ public:
 		SetPrototypeMethod(isolate, data, t, "close", JS_close);
 		SetPrototypeMethod(isolate, data, t, "defaultSafeIntegers", JS_defaultSafeIntegers);
 		SetPrototypeMethod(isolate, data, t, "unsafeMode", JS_unsafeMode);
+		SetPrototypeMethod(isolate, data, t, "getLockState", JS_getLockState);
 		SetPrototypeGetter(isolate, data, t, "open", JS_open);
 		SetPrototypeGetter(isolate, data, t, "inTransaction", JS_inTransaction);
 		return t->GetFunction(OnlyContext).ToLocalChecked();
@@ -410,6 +411,23 @@ private:
 		if (info.Length() == 0) db->unsafe_mode = true;
 		else { REQUIRE_ARGUMENT_BOOLEAN(first, db->unsafe_mode); }
 		sqlite3_db_config(db->db_handle, SQLITE_DBCONFIG_DEFENSIVE, static_cast<int>(!db->unsafe_mode), NULL);
+	}
+
+	NODE_METHOD(JS_getLockState) {
+		Database* db = Unwrap<Database>(info.This());
+		int state;
+		if (info.Length() == 0 || info[0]->IsUndefined()) {
+			state = sqlite3_txn_state(db->db_handle, NULL);
+		} else {
+			REQUIRE_ARGUMENT_STRING(first, v8::Local<v8::String> schema);
+			UseIsolate;
+			state = sqlite3_txn_state(db->db_handle, *v8::String::Utf8Value(isolate, schema));
+			if (state < 0) {
+				ThrowRangeError("Invalid schema name");
+				return;
+			}
+		}
+		info.GetReturnValue().Set(state);
 	}
 
 	NODE_GETTER(JS_open) {
